@@ -11,14 +11,14 @@ from dotenv import load_dotenv
 # env 변수
 load_dotenv()
 
+CHROME_DRIVER_ONPIA_URL = os.getenv("CHROME_DRIVER_ONPIA_URL")
 LETTER_PROGRESS = os.getenv("LETTER_PROGRESS")
 MY_CAMP_ID = os.getenv("MY_CAMP_ID")
 MY_CAMP_PASSWORD = os.getenv("MY_CAMP_PASSWORD")
 
 # 인편 보내기 로직
 def send_internet_letter(soldier_name, final_list):
-    chromedriver = "C:\\Users\\onpia\\Desktop\\project\\python\\chromedriver.exe"
-
+    chromedriver = CHROME_DRIVER_ONPIA_URL
     options = webdriver.ChromeOptions()
     # options.add_argument('headless')
     options.add_argument('window-size=1920,1080')

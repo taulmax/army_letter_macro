@@ -7,6 +7,13 @@ from time import sleep
 import datetime
 from gensim.summarization.summarizer import summarize
 from newspaper import Article
+import os
+from dotenv import load_dotenv
+
+# env 변수
+load_dotenv()
+
+CHROME_DRIVER_ONPIA_URL = os.getenv("CHROME_DRIVER_ONPIA_URL")
 
 # 실검 스크래퍼
 def ZUM_scrapper():
@@ -15,7 +22,7 @@ def ZUM_scrapper():
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
 
     # 크롬 드라이버 위치
-    chromedriver = "C:\\Users\\onpia\\Desktop\\project\\python\\chromedriver.exe"
+    chromedriver = CHROME_DRIVER_ONPIA_URL
 
     # 크롬 드라이버 옵션
     options = webdriver.ChromeOptions()
