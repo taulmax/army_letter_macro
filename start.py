@@ -21,7 +21,7 @@ SOL1802 = os.getenv("SOL1802")
 SOL5226 = os.getenv("SOL5226")
 
 # ZUM 실검 군인 리스트
-ZUM_SOL_LIST = [SOL5226]
+ZUM_SOL_LIST = [SOL1802,SOL5226]
 
 # 시작 함수
 def init():

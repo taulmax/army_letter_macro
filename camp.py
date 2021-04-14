@@ -20,7 +20,7 @@ MY_CAMP_PASSWORD = os.getenv("MY_CAMP_PASSWORD")
 def send_internet_letter(soldier_name, final_list):
     chromedriver = CHROME_DRIVER_ONPIA_URL
     options = webdriver.ChromeOptions()
-    # options.add_argument('headless')
+    options.add_argument('headless')
     options.add_argument('window-size=1920,1080')
 
     driver = webdriver.Chrome(chromedriver, options=options)
@@ -86,12 +86,13 @@ def send_internet_letter(soldier_name, final_list):
     if len(card_btn_list) == 2:
         card_btn_list[0].click()
         time.sleep(1)
-        write_letter_btn = driver.find_element_by_xpath('/html/body/div[1]/div[3]/div[2]/div[3]/button')
-        write_letter_btn.click()
-        time.sleep(1)
 
         # 여기서부터 반복
         for idx, item in enumerate(final_list,1):
+            write_letter_btn = driver.find_element_by_xpath('/html/body/div[1]/div[3]/div[2]/div[3]/button')
+            write_letter_btn.click()
+            time.sleep(1)
+
             letter_title = driver.find_element_by_xpath('//*[@id="sympathyLetterSubject"]')
             letter_iframes = driver.find_elements_by_tag_name('iframe')
 
