@@ -12,23 +12,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 CHROME_DRIVER_ONPIA_URL = os.getenv("CHROME_DRIVER_ONPIA_URL")
+LETTER_SUCCESS = os.getenv("LETTER_SUCCESS")
 LETTER_PROGRESS = os.getenv("LETTER_PROGRESS")
+NO_CAFE = os.getenv("NO_CAFE")
+ERROR_CAFE = os.getenv("ERROR_CAFE")
 MY_CAMP_ID = os.getenv("MY_CAMP_ID")
 MY_CAMP_PASSWORD = os.getenv("MY_CAMP_PASSWORD")
 
-# 인편 보내기 로직
-def send_internet_letter(soldier_name, final_list):
-    chromedriver = CHROME_DRIVER_ONPIA_URL
-    options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    options.add_argument('window-size=1920,1080')
-
-    driver = webdriver.Chrome(chromedriver, options=options)
-    driver.implicitly_wait(5)
-
-    driver.get('https://www.thecamp.or.kr/login/viewLogin.do')
-    time.sleep(1)
-
+# 더 캠프 로그인
+def the_camp_login(driver):
     # 아이디 입력
     input_id = WebDriverWait(driver,timeout=5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="userId"]'))) 
     time.sleep(1)
@@ -45,6 +37,22 @@ def send_internet_letter(soldier_name, final_list):
     time.sleep(1)
     login.click()
     time.sleep(1)
+
+# 인편 보내기 로직
+def send_internet_letter(soldier_name, final_list):
+    chromedriver = CHROME_DRIVER_ONPIA_URL
+    options = webdriver.ChromeOptions()
+    # options.add_argument('headless')
+    options.add_argument('window-size=1920,1080')
+
+    driver = webdriver.Chrome(chromedriver, options=options)
+    driver.implicitly_wait(5)
+
+    driver.get('https://www.thecamp.or.kr/login/viewLogin.do')
+    time.sleep(1)
+
+    # 더 캠프 로그인
+    the_camp_login(driver)
 
     # 카페 가입하기 (아마 까페 개설 확인까지 해야될거같긴한데 그건 민준이꺼 보고 한번 판단해보도록 하자)
 
@@ -123,6 +131,8 @@ def send_internet_letter(soldier_name, final_list):
             time.sleep(2)
             send_kakao_message_to_me(LETTER_PROGRESS, {"all": len(final_list), "current_idx": idx})
 
+        send_kakao_message_to_me(LETTER_SUCCESS, {"name":soldier_name})
+
     # 인편을 보낼 수 없는 상태
     elif len(card_btn_list) == 1:
         card_btn_list[0].click()
@@ -130,12 +140,13 @@ def send_internet_letter(soldier_name, final_list):
         alert = driver.switch_to.alert
         message = alert.text.split('\n')[0]
         print(message)
-        if message == "카페가 아직 개설전 입니다":
-            solider_state_log = "카페 개설 X"
+        if message == "카페가 아직 개설전 입니다.":
+            alert.accept()
+            send_kakao_message_to_me(NO_CAFE, {"name":soldier_name})
+        elif message == "이미 등록된 훈련병입니다.":
+            alert.accept()
 
     # 이런 상태는 있으면 안된다. 에러가 난것
     else:
-        print("아마 에러인듯")
-        solider_state_log = "나올수 없는 상태"
-
-
+        print("있을 수 없는 상태입니다. 에러입니다. 버튼이 0개 이하 혹은 3개 이상입니다.")
+        send_kakao_message_to_me(ERROR_CAFE, {"name":soldier_name})

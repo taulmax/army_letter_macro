@@ -19,9 +19,12 @@ ZUM = os.getenv("ZUM")
 
 SOL1802 = os.getenv("SOL1802")
 SOL5226 = os.getenv("SOL5226")
+SOL4008 = os.getenv("SOL4008")
+SOL0728 = os.getenv("SOL0728")
+SOL0807 = os.getenv("SOL0807")
 
 # ZUM 실검 군인 리스트
-ZUM_SOL_LIST = [SOL1802,SOL5226]
+ZUM_SOL_LIST = [SOL1802]
 
 # 시작 함수
 def init():
@@ -49,7 +52,6 @@ def init():
             send_kakao_message_to_me(LETTER_START, {"name":sol})
             try:
                 send_internet_letter(sol, final_list)
-                send_kakao_message_to_me(LETTER_SUCCESS, {"name":sol})
             except:
                 send_kakao_message_to_me(LETTER_FAILURE, {"name":sol})
         else:
