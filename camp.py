@@ -7,6 +7,7 @@ from kakao import send_kakao_message_to_me
 import time
 import os
 from dotenv import load_dotenv
+from slack import slack_camp_no_cafe, slack_camp_activate_cafe, slack_camp_error_cafe, slack_camp_progress
 
 # env 변수
 load_dotenv()
@@ -79,6 +80,7 @@ def send_letter(card, final_list, driver, soldier_name):
         final_send.click()
         time.sleep(2)
         send_kakao_message_to_me(LETTER_PROGRESS, {"all": len(final_list), "current_idx": idx})
+        slack_camp_progress(soldier_name, len(final_list), idx)
 
     send_kakao_message_to_me(LETTER_SUCCESS, {"name":soldier_name})
 
@@ -148,11 +150,13 @@ def try_send_letter(soldier_name, final_list):
         if message == "카페가 아직 개설전 입니다.":
             alert.accept()
             send_kakao_message_to_me(NO_CAFE, {"name":soldier_name})
+            slack_camp_no_cafe(soldier_name)
         elif message == "이미 등록된 훈련병입니다.":
             alert.accept()
             time.sleep(1)
             driver.quit()
             send_kakao_message_to_me(ACTIVATE_CAFE, {"name":soldier_name})
+            slack_camp_activate_cafe(soldier_name)
             try_send_letter(soldier_name, final_list)
             
 
@@ -160,3 +164,4 @@ def try_send_letter(soldier_name, final_list):
     else:
         print("있을 수 없는 상태입니다. 에러입니다. 버튼이 0개 이하 혹은 3개 이상입니다.")
         send_kakao_message_to_me(ERROR_CAFE, {"name":soldier_name})
+        slack_camp_error_cafe(soldier_name)

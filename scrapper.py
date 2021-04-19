@@ -9,6 +9,7 @@ from gensim.summarization.summarizer import summarize
 from newspaper import Article
 import os
 from dotenv import load_dotenv
+from slack import slack_zum_success, slack_real_letter_text
 
 # env 변수
 load_dotenv()
@@ -125,10 +126,10 @@ def ZUM_scrapper():
                 article_summary = article_summary.replace("\t","").replace("\n","")[:content_letter_count]
 
             # 뉴스 리스트에 정보를 넣어줌
-            news_list.append({"title":news_title.text, "article": article_summary})
+            news_list.append({"title":news_title.text, "article": article_summary, "URL": news_href})
             article_num = article_num + 1 
         except Exception as error:
-            news_list.append({"title":news_title.text, "article": "크롤링 실패"})
+            news_list.append({"title":news_title.text, "article": "크롤링 실패", "URL": news_href })
             error_company.append({"title": f"{rank}. {silgum} : {news_title.text}", "log": f"Error : {error}"})
 
         # 결과 리스트에 최종 결과물을 넣어줌
@@ -146,17 +147,24 @@ def ZUM_scrapper():
     print(f"크롤링 실패 뉴스 : {error_company}")
     print(f"요약 로그 : {summary_log}")
 
+    # ZUM SLACK TEXT
+    ZUM_SLACK_TEXT = ""
+
     # 내용에 붙여넣을 문자열 만들기
     for idx,word in enumerate(result,1):
         if idx <= 5:
             first_letter_contents = first_letter_contents + str(word["rank"]) + ". " + word["word"] + " : "
+            ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + str(word["rank"]) + ". " + word["word"] + "\n"
         else:
             second_letter_contents = second_letter_contents + str(word["rank"]) + ". " + word["word"] + " : "
+            ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + str(word["rank"]) + ". " + word["word"] + "\n"
         for news in word["news"]:
             if idx <= 5:
                 first_letter_contents = first_letter_contents + "[" + news["title"] + "] - " + news["article"] + "\n"
+                ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + "<" + news["URL"] + "|" + news["title"] + ">" + "\n\n"
             else:
                 second_letter_contents = second_letter_contents + "[" + news["title"] + "] - " + news["article"] + "\n"
+                ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + "<" + news["URL"] + "|" + news["title"] + ">" + "\n\n"
 
     # 최종적으로 넘길 정보
     ZUM_result = [
@@ -169,5 +177,10 @@ def ZUM_scrapper():
             "contents": second_letter_contents
         }
     ]
+
+    # 슬랙에 로깅
+    slack_zum_success(ZUM_SLACK_TEXT)
+    for i in range(len(ZUM_result)):
+        slack_real_letter_text(i+1, "제목 : " + ZUM_result[i]["title"] + "\n" + ZUM_result[i]["contents"])
 
     return ZUM_result
