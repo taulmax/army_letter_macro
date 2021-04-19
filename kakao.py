@@ -193,18 +193,3 @@ def check_token_expired_before_start():
 
 
 
-
-
-# import datetime
-# import schedule
-# import time
-
-# def test_schedule():
-#     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-#     send_kakao_message_to_me("51701",{"now":now})
-
-# schedule.every().day.at("10:00").do(test_schedule)
-
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)

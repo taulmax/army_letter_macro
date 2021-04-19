@@ -1,8 +1,11 @@
 from scrapper import ZUM_scrapper
-from camp import send_internet_letter
+from camp import try_send_letter
 import os
 from dotenv import load_dotenv
 from kakao import send_kakao_message_to_me, check_token_expired_before_start
+import datetime
+import schedule
+import time
 
 # env 변수
 load_dotenv()
@@ -24,7 +27,7 @@ SOL0728 = os.getenv("SOL0728")
 SOL0807 = os.getenv("SOL0807")
 
 # ZUM 실검 군인 리스트
-ZUM_SOL_LIST = [SOL1802]
+ZUM_SOL_LIST = [SOL1802,SOL5226,SOL4008,SOL0728,SOL0807]
 
 # 시작 함수
 def init():
@@ -51,11 +54,15 @@ def init():
         if final_list:
             send_kakao_message_to_me(LETTER_START, {"name":sol})
             try:
-                send_internet_letter(sol, final_list)
+                try_send_letter(sol, final_list)
             except:
                 send_kakao_message_to_me(LETTER_FAILURE, {"name":sol})
         else:
             send_kakao_message_to_me(LETTER_ERROR, {"name":sol})
     
 
-init()
+schedule.every().day.at("18:00").do(init)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
