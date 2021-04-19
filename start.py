@@ -37,10 +37,10 @@ nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
 # 시작 함수
 def init():
     # 카카오 토큰 만료 여부 확인 후 갱신
-    check_token_expired_before_start()
+    # check_token_expired_before_start()
 
     # 크롤링 시작 카톡 보냄
-    send_kakao_message_to_me(SCRAP_START, {"target":ZUM})
+    # send_kakao_message_to_me(SCRAP_START, {"target":ZUM})
 
     # 크롤링 시작 슬랙 보냄
     slack_zum_start(nowDatetime)
@@ -52,24 +52,24 @@ def init():
     try:
         ZUM_silgum = ZUM_scrapper()
         final_list = final_list + ZUM_silgum
-        send_kakao_message_to_me(SCRAP_SUCCESS, {"target":ZUM})
+        # send_kakao_message_to_me(SCRAP_SUCCESS, {"target":ZUM})
     except:
-        send_kakao_message_to_me(SCRAP_FAILURE, {"target":ZUM})
+        # send_kakao_message_to_me(SCRAP_FAILURE, {"target":ZUM})
         slack_zum_failure()
 
     # 크롤링에 성공했으면 인편, 실패했으면 카카오 메시지 전송 후 끝
     # 추후에 스페어 인편이라도 준비해주면 좋을듯 하다.
     for sol in ZUM_SOL_LIST:
         if final_list:
-            send_kakao_message_to_me(LETTER_START, {"name":sol})
+            # send_kakao_message_to_me(LETTER_START, {"name":sol})
             slack_camp_start(sol)
             try:
                 try_send_letter(sol, final_list)
             except:
-                send_kakao_message_to_me(LETTER_FAILURE, {"name":sol})
+                # send_kakao_message_to_me(LETTER_FAILURE, {"name":sol})
                 slack_camp_failure(sol)
         else:
-            send_kakao_message_to_me(LETTER_ERROR, {"name":sol})
+            # send_kakao_message_to_me(LETTER_ERROR, {"name":sol})
             slack_camp_error(sol)
     
 
