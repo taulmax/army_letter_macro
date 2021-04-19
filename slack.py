@@ -247,21 +247,21 @@ def slack_camp_progress(name, all, index):
     print("Slack Camp Progress Response : " + response.text)
 
 # 더캠프 인편 완료
-def slack_camp_success(name):
+def slack_camp_success():
     data = {
         "blocks": [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"{name}님 : 인편 전송 성공" ,
+                    "text": "인편 전송 완료" ,
                 }
             },
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{name}님의 인편이 성공적으로 전송되었습니다.",
+                    "text": "오늘자 인편 전송 완료되었습니다. 내일 또 봬요 :)",
                 }
             },
             {

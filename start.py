@@ -6,7 +6,7 @@ from kakao import send_kakao_message_to_me, check_token_expired_before_start
 import datetime
 import schedule
 import time
-from slack import slack_zum_start, slack_zum_failure, slack_camp_start, slack_camp_failure, slack_camp_error
+from slack import slack_zum_start, slack_zum_failure, slack_camp_start, slack_camp_failure, slack_camp_error, slack_camp_success
 
 # env 변수
 load_dotenv()
@@ -72,6 +72,7 @@ def init():
             # send_kakao_message_to_me(LETTER_ERROR, {"name":sol})
             slack_camp_error(sol)
     
+    slack_camp_success()
 
 schedule.every().day.at("18:00").do(init)
 
