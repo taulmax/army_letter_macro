@@ -31,11 +31,11 @@ SOL0807 = os.getenv("SOL0807")
 ZUM_SOL_LIST = [SOL1802, SOL5226, SOL4008, SOL0728, SOL0807]
 
 # 현재 날짜 구하기
-now = datetime.datetime.now()
-nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 # 시작 함수
 def init():
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
     # 카카오 토큰 만료 여부 확인 후 갱신
     # check_token_expired_before_start()
 
@@ -74,12 +74,8 @@ def init():
     
     slack_camp_success()
 
-# Loop
-def loop_everyday():
-    schedule.every().day.at("18:00").do(init)
+schedule.every().day.at("18:00").do(init)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-loop_everyday()
+while True:
+    schedule.run_pending()
+    time.sleep(1)
