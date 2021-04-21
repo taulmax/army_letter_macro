@@ -36,6 +36,8 @@ ZUM_SOL_LIST = [SOL1802, SOL5226, SOL4008, SOL0728, SOL0807]
 def init():
     now = datetime.datetime.now()
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    print(nowDatetime + " : 작동을 시작합니다.")
     # 카카오 토큰 만료 여부 확인 후 갱신
     # check_token_expired_before_start()
 
