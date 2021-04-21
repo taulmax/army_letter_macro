@@ -31,6 +31,8 @@ SOL0807 = os.getenv("SOL0807")
 ZUM_SOL_LIST = [SOL1802, SOL5226, SOL4008, SOL0728, SOL0807]
 
 # 현재 날짜 구하기
+ubuntu_now = datetime.datetime.now()
+ubuntu_nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
 
 # 시작 함수
 def init():
@@ -76,6 +78,7 @@ def init():
     
     slack_camp_success()
 
+print(ubuntu_nowDatetime)
 schedule.every().day.at("18:00").do(init)
 
 while True:
