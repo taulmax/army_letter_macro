@@ -184,5 +184,3 @@ def ZUM_scrapper():
         slack_real_letter_text(i+1, "제목 : " + ZUM_result[i]["title"] + "\n" + ZUM_result[i]["contents"])
 
     return ZUM_result
-
-ZUM_scrapper()
