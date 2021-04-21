@@ -80,4 +80,5 @@ schedule.every().day.at("18:00").do(init)
 
 while True:
     schedule.run_pending()
+    print("test")
     time.sleep(1)
