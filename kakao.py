@@ -28,17 +28,17 @@ def get_token():
     tokens = response.json()
 
     # 토큰 저장 : refresh token으로 갱신할때는 여기에 갱신
-    with open("kakao_code.json","w") as fp:
+    with open("./json/kakao_code.json","w") as fp:
         json.dump(tokens, fp)
 
     # 토큰 저장 : 이 함수를 실행할때 빼고는 읽기만 가능한 파일
-    with open("original_kakao_code.json","w") as fp:
+    with open("./json/original_kakao_code.json","w") as fp:
         json.dump(tokens, fp)
 
 # 토큰 갱신 함수
 def refresh_token():
     # json 파일에서 정보를 가져옴
-    with open("original_kakao_code.json","r") as fp:
+    with open("./json/original_kakao_code.json","r") as fp:
         tokens = json.load(fp)
 
     # env 변수 가져오기
@@ -64,18 +64,18 @@ def refresh_token():
 
     if "refresh_token" in tokens:
         # tokens를 original_kakao_code 파일에 저장
-        with open("original_kakao_code.json","w") as fp:
+        with open("./json/original_kakao_code.json","w") as fp:
             json.dump(tokens, fp)
 
 
     # tokens를 json 파일에 저장
-    with open("kakao_code.json","w") as fp:
+    with open("./json/kakao_code.json","w") as fp:
         json.dump(tokens, fp)
 
 # 토큰이 유효한지 확인
 def check_token_info():
     # json파일에서 정보를 가져옴
-    with open("kakao_code.json","r") as fp:
+    with open("./json/kakao_code.json","r") as fp:
         tokens = json.load(fp)
 
     # Access Token Info Request URL
@@ -96,7 +96,7 @@ def check_token_info():
 # 친구 목록 가져오기
 def get_kakao_friends():
     # json 파일에서 정보를 가져옴
-    with open("kakao_code.json","r") as fp:
+    with open("./json/kakao_code.json","r") as fp:
         tokens = json.load(fp)
 
     # Get Kakao Friends List Request URL
@@ -124,7 +124,7 @@ def get_kakao_friends():
 # 친구에게 카카오톡 메시지 전송
 def send_kakao_message_to_friend(template_id, template_args):
     # json 파일에서 정보를 가져옴
-    with open("kakao_code.json","r") as fp:
+    with open("./json/kakao_code.json","r") as fp:
         tokens = json.load(fp)
 
     # Send Kakao Message To Friend Request URL
@@ -151,7 +151,7 @@ def send_kakao_message_to_friend(template_id, template_args):
 # 나에게 카카오톡 메시지 전송
 def send_kakao_message_to_me(template_id, template_args):
     # json 파일에서 정보를 가져옴
-    with open("kakao_code.json","r") as fp:
+    with open("./json/kakao_code.json","r") as fp:
         tokens = json.load(fp)
 
     # Send Kakao Message To Friend Request URL
