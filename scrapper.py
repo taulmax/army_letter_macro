@@ -9,7 +9,7 @@ from gensim.summarization.summarizer import summarize
 from newspaper import Article
 import os
 from dotenv import load_dotenv
-from slack import slack_zum_success, slack_real_letter_text
+from slack import slack_zum_success
 
 # env 변수
 load_dotenv()
@@ -56,10 +56,6 @@ def ZUM_scrapper():
     # 요약 로그
     summary_log = {}
 
-    # 내용에 들어갈 문자열들
-    first_letter_contents = ""
-    second_letter_contents = ""
-
     # 메인페이지에서 실시간 검색어 탐색
     wrap_container = driver.find_element_by_id("wrap_container")
     issue_keyword_total = wrap_container.find_element_by_class_name("issue_keyword_total")
@@ -81,9 +77,7 @@ def ZUM_scrapper():
         driver.implicitly_wait(5)
         driver.get(href)
 
-        # news_ul = WebDriverWait(driver,timeout=5).until(EC.presence_of_element_located((By.ID, "newsItemUl"))) 
-        # news_li = news_ul.find_elements_by_xpath('//*[@id="newsItemUl"]/li')
-        news_list = []
+        news_obj = {}
 
         news_title_xpath = f'//*[@id="newsItemUl"]/li[1]/dl/dt/a[@class="report-link"]'
         news_title = WebDriverWait(driver,timeout=5).until(EC.presence_of_element_located((By.XPATH, news_title_xpath)))
@@ -94,49 +88,37 @@ def ZUM_scrapper():
         article.download()
         try:
             article.parse()
-            article_summary = ""
-            
-            # 단어 수로 먼저 요약
-            for i in range(30):
-                num = (i+12)*5
-                article_summary = summarize(article.text, word_count=int(num))
-                if article_summary:
-                    summary_log[f"rank{rank}"] = f"{rank}. {num}단어"
-                    break
-                    
-            # 단어 수로 요약하는게 실패했을 경우, 비율로 요약
-            if not article_summary:
-                for j in range(10):
-                    ratio_num = (j+1) * 0.3
-                    article_summary = summarize(article.text, ratio=ratio_num)
-                    if article_summary:
-                        summary_log[f"rank{rank}"] = f"{rank}. {ratio_num}비율"
-                        break
-
-            # 둘 다 실패했을경우 그냥 본문 가져오기
-            if not article_summary:
-                article_summary = article.text
-                summary_log[f"rank{rank}"] = f"{rank}. 본문 가져옴"
-
-            # 한 기사당 300자를 넘지 않게 커트해줌
             silgum_and_title = f"{rank}. {silgum}\n[{news_title.text}]\n"
-            content_letter_count = 298 - len(silgum_and_title)
-            
-            if len(article_summary) > content_letter_count:
-                article_summary = article_summary.replace("\t","").replace("\n","")[:content_letter_count]
+            article_summary = article.text
+
+            if len(article.text) > 1498 - len(silgum_and_title):
+                ratio = round((1498 - len(silgum_and_title))/len(article.text),2)
+                article_summary = summarize(article.text, ratio=ratio)
+                if article_summary:
+                    summary_log[f"rank{rank}"] = f"{ratio}비율"
+                else:
+                   article_summary = article.text
+
+            # 1500자를 넘지 않게 커트해줌
+            if len(silgum_and_title) + len(article_summary) > 1498:
+                article_summary = article_summary.replace("\t","")[:1498]
 
             # 뉴스 리스트에 정보를 넣어줌
-            news_list.append({"title":news_title.text, "article": article_summary, "URL": news_href})
+            news_obj["title"] = news_title.text
+            news_obj["article"] = article_summary
+            news_obj["URL"] = news_href
             article_num = article_num + 1 
         except Exception as error:
-            news_list.append({"title":news_title.text, "article": "크롤링 실패", "URL": news_href })
+            news_obj["title"] = news_title.text
+            news_obj["article"] = "크롤링 실패"
+            news_obj["URL"] = news_href
             error_company.append({"title": f"{rank}. {silgum} : {news_title.text}", "log": f"Error : {error}"})
 
         # 결과 리스트에 최종 결과물을 넣어줌
         result.append({
             "rank": rank,
             "word": silgum,
-            "news": news_list,
+            "news": news_obj,
         })
         rank = rank + 1
 
@@ -150,37 +132,11 @@ def ZUM_scrapper():
     # ZUM SLACK TEXT
     ZUM_SLACK_TEXT = ""
 
-    # 내용에 붙여넣을 문자열 만들기
-    for idx,word in enumerate(result,1):
-        if idx <= 5:
-            first_letter_contents = first_letter_contents + str(word["rank"]) + ". " + word["word"] + " : "
-            ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + str(word["rank"]) + ". " + word["word"] + "\n"
-        else:
-            second_letter_contents = second_letter_contents + str(word["rank"]) + ". " + word["word"] + " : "
-            ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + str(word["rank"]) + ". " + word["word"] + "\n"
-        for news in word["news"]:
-            if idx <= 5:
-                first_letter_contents = first_letter_contents + "[" + news["title"] + "] - " + news["article"] + "\n"
-                ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + "<" + news["URL"] + "|" + news["title"] + ">" + "\n\n"
-            else:
-                second_letter_contents = second_letter_contents + "[" + news["title"] + "] - " + news["article"] + "\n"
-                ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + "<" + news["URL"] + "|" + news["title"] + ">" + "\n\n"
-
-    # 최종적으로 넘길 정보
-    ZUM_result = [
-        {
-            "title": "ZUM 실시간 검색어 TOP10 요약 1~5위 " + nowDatetime,
-            "contents": first_letter_contents
-        },
-        {
-            "title": "ZUM 실시간 검색어 TOP10 요약 6~10위 " + nowDatetime,
-            "contents": second_letter_contents
-        }
-    ]
+    # Slack에 로깅할 문자열 만들기
+    for word in result:
+        ZUM_SLACK_TEXT = ZUM_SLACK_TEXT + str(word["rank"]) + ". " + word["word"] + "\n" + "<" + word["news"]["URL"] + "|" + word["news"]["title"] + ">" + "\n\n"
 
     # 슬랙에 로깅
     slack_zum_success(ZUM_SLACK_TEXT)
-    for i in range(len(ZUM_result)):
-        slack_real_letter_text(i+1, "제목 : " + ZUM_result[i]["title"] + "\n" + ZUM_result[i]["contents"])
 
-    return ZUM_result
+    return result

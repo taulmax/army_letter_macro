@@ -41,12 +41,12 @@ def the_camp_login(driver):
     time.sleep(1)
 
 # 인편을 보낼 수 있는 상태면, 인편 보내는 함수
-def send_letter(card, final_list, driver, soldier_name):
+def send_letter(card, ZUM_RESULT, driver, soldier_name):
     card.click()
     time.sleep(1)
 
     # 여기서부터 반복
-    for idx, item in enumerate(final_list,1):
+    for idx, item in enumerate(ZUM_RESULT,1):
         write_letter_btn = driver.find_element_by_xpath('/html/body/div[1]/div[3]/div[2]/div[3]/button')
         write_letter_btn.click()
         time.sleep(1)
@@ -55,7 +55,7 @@ def send_letter(card, final_list, driver, soldier_name):
         letter_iframes = driver.find_elements_by_tag_name('iframe')
 
         # 제목 입력
-        letter_title.send_keys(item["title"])
+        letter_title.send_keys("ZUM 실검 " + idx + "위 : " + item["news"]["title"])
 
         # iframe 탐색 후 내용 입력
         for i, iframe in enumerate(letter_iframes):
@@ -65,7 +65,7 @@ def send_letter(card, final_list, driver, soldier_name):
                     html = driver.find_element_by_xpath('/html[@dir="ltr"]')
                     contents = html.find_element_by_tag_name('p')
                     contents.click()
-                    contents.send_keys(item["contents"])
+                    contents.send_keys(item["news"]["article"])
                     time.sleep(3)
                 except:
                     driver.switch_to_default_content()
@@ -79,13 +79,13 @@ def send_letter(card, final_list, driver, soldier_name):
         final_send = driver.find_element_by_xpath('/html/body/div[1]/div[3]/section/div[2]/a[3]')
         final_send.click()
         time.sleep(2)
-        # send_kakao_message_to_me(LETTER_PROGRESS, {"all": len(final_list), "current_idx": idx})
-        slack_camp_progress(soldier_name, len(final_list), idx)
+        # send_kakao_message_to_me(LETTER_PROGRESS, {"all": len(ZUM_RESULT), "current_idx": idx})
+        slack_camp_progress(soldier_name, len(ZUM_RESULT), idx)
 
     # send_kakao_message_to_me(LETTER_SUCCESS, {"name":soldier_name})
 
 # 인편 보내기 로직
-def try_send_letter(soldier_name, final_list):
+def try_send_letter(soldier_name, ZUM_RESULT):
     chromedriver = CHROME_DRIVER_ONPIA_URL
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
@@ -138,7 +138,7 @@ def try_send_letter(soldier_name, final_list):
 
     # 인편을 보낼 수 있는 상태
     if len(card_btn_list) == 2:
-        send_letter(card_btn_list[0], final_list, driver, soldier_name)
+        send_letter(card_btn_list[0], ZUM_RESULT, driver, soldier_name)
 
     # 인편을 보낼 수 없는 상태
     elif len(card_btn_list) == 1:
@@ -157,7 +157,7 @@ def try_send_letter(soldier_name, final_list):
             driver.quit()
             # send_kakao_message_to_me(ACTIVATE_CAFE, {"name":soldier_name})
             slack_camp_activate_cafe(soldier_name)
-            try_send_letter(soldier_name, final_list)
+            try_send_letter(soldier_name, ZUM_RESULT)
             
 
     # 이런 상태는 있으면 안된다. 에러가 난것

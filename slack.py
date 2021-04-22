@@ -90,34 +90,6 @@ def slack_zum_failure():
     response = requests.post(SLACK_ZUM_URL, json=data)
     print("Slack Zum Failure Response : " + response.text)
 
-# 실제 인편 TEXT
-def slack_real_letter_text(index, text):
-    data = {
-        "blocks": [
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"실제 인편 내용 ({index})" ,
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": text,
-                }
-            },
-            {
-                "type":"divider"
-            }
-        ]
-    }
-
-    response = requests.post(SLACK_ZUM_URL, json=data)
-    print("Slack Real Letter Text Response : " + response.text)
-
-
 # 인편 전송 시작
 def slack_camp_start(name):
     data = {

@@ -50,12 +50,12 @@ def init():
     slack_zum_start(nowDatetime)
 
     # 최종 내용 리스트
-    final_list = []
+    ZUM_RESULT = []
 
     # ZUM 크롤링 시도 (성공시 성공 카톡, 실패시 실패 카톡)
     try:
         ZUM_silgum = ZUM_scrapper()
-        final_list = final_list + ZUM_silgum
+        ZUM_RESULT = ZUM_RESULT + ZUM_silgum
         # send_kakao_message_to_me(SCRAP_SUCCESS, {"target":ZUM})
     except:
         # send_kakao_message_to_me(SCRAP_FAILURE, {"target":ZUM})
@@ -64,11 +64,11 @@ def init():
     # 크롤링에 성공했으면 인편, 실패했으면 카카오 메시지 전송 후 끝
     # 추후에 스페어 인편이라도 준비해주면 좋을듯 하다.
     for sol in ZUM_SOL_LIST:
-        if final_list:
+        if ZUM_RESULT:
             # send_kakao_message_to_me(LETTER_START, {"name":sol})
             slack_camp_start(sol)
             try:
-                try_send_letter(sol, final_list)
+                try_send_letter(sol, ZUM_RESULT)
             except:
                 # send_kakao_message_to_me(LETTER_FAILURE, {"name":sol})
                 slack_camp_failure(sol)
@@ -78,9 +78,11 @@ def init():
     
     slack_camp_success()
 
-print(ubuntu_nowDatetime)
-schedule.every().day.at("18:00").do(init)
+# print(ubuntu_nowDatetime)
+# schedule.every().day.at("18:00").do(init)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
+
+init()
