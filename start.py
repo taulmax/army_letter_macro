@@ -78,11 +78,9 @@ def init():
     
     slack_camp_success()
 
-# print(ubuntu_nowDatetime)
-# schedule.every().day.at("18:00").do(init)
+print(ubuntu_nowDatetime)
+schedule.every().day.at("18:00").do(init)
 
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
-
-init()
+while True:
+    schedule.run_pending()
+    time.sleep(1)
