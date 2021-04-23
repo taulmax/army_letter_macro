@@ -89,7 +89,7 @@ def send_letter(card, ZUM_RESULT, driver, soldier_name):
 def try_send_letter(soldier_name, ZUM_RESULT):
     chromedriver = CHROME_DRIVER_ONPIA_URL
     options = webdriver.ChromeOptions()
-    # options.add_argument('headless')
+    options.add_argument('headless')
     options.add_argument('window-size=1920,1080')
 
     driver = webdriver.Chrome(chromedriver, options=options)
