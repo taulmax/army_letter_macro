@@ -54,8 +54,9 @@ def send_letter(card, ZUM_RESULT, driver, soldier_name):
         letter_title = driver.find_element_by_xpath('//*[@id="sympathyLetterSubject"]')
         letter_iframes = driver.find_elements_by_tag_name('iframe')
 
+
         # 제목 입력
-        letter_title.send_keys("ZUM 실검 " + idx + "위 : " + item["news"]["title"])
+        letter_title.send_keys("ZUM 실검 " + str(idx) + "위 : " + item["news"]["title"])
 
         # iframe 탐색 후 내용 입력
         for i, iframe in enumerate(letter_iframes):
@@ -88,7 +89,7 @@ def send_letter(card, ZUM_RESULT, driver, soldier_name):
 def try_send_letter(soldier_name, ZUM_RESULT):
     chromedriver = CHROME_DRIVER_ONPIA_URL
     options = webdriver.ChromeOptions()
-    options.add_argument('headless')
+    # options.add_argument('headless')
     options.add_argument('window-size=1920,1080')
 
     driver = webdriver.Chrome(chromedriver, options=options)
